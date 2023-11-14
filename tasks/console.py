@@ -66,7 +66,7 @@ class FrameLine(Line):
         line_prefix = f" => => {time_formatted} [{self.frame_type.name}] "
         data_allowed_length = terminal.width - len(line_prefix)
         data_string = str(self.frame_data)[:data_allowed_length]
-        return f" => => [{time_formatted}] [{self._colorized_type(terminal).lower()}] {data_string}"
+        return f" => => {time_formatted} [{self._colorized_type(terminal).lower()}] {data_string}"
 
 
 class Console:
@@ -89,9 +89,9 @@ class Console:
         Unpin the first line deemed to be the least important.
         :return: The index of the line unpinned.
         """
-        if len([line for line in self.lines if isinstance(line, TaskLine)]) > 4:
+        if len([line for line in self.lines if isinstance(line, TaskLine)]) > 2:
             return self._unpin_first(TaskLine)
-        if len([line for line in self.lines if isinstance(line, RunLine)]) > 4:
+        if len([line for line in self.lines if isinstance(line, RunLine)]) > 2:
             return self._unpin_first(RunLine)
         return self._unpin_first(FrameLine)
 
