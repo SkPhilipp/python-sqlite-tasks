@@ -2,10 +2,14 @@
 
 [![Status: Alpha](https://img.shields.io/badge/status-alpha-red)](https://release-engineers.com/open-source-badges/)
 
-## Description
+For serious task management on a budget. This is a Python library for orchestrating long-lived tasks without requiring any backing infrastructure. Tasks
+are managed by both producers and consumers through a shared SQL database.
 
-This is a Python package for managing long-lived tasks. Task management is done through a shared SQL database used by both producers and consumers of tasks.
-Neither producers nor consumers are required to be running at all times or are in any way connected to each other.
+Notable architectural features:
+
+- Both producers and consumers do not communicate with or amongst each other.
+- Both producers and consumers do not need to be running at all times.
+- No central broker other than a SQL database is required, which could even be a SQLite file.
 
 The [demo](demo) package includes an executable task producer and consumer combination sharing a local SQLite database.
 
@@ -26,9 +30,10 @@ for frame in framework.follow(task):
 
 ### Consumers
 
-Consumers can claim tasks and yield data, logs and status updates, like so:
+Consumers can claim tasks and report back data, logs and status updates through a `Task` object:
 
 ```python
+#!/usr/bin/env python3
 from tasks.framework import TaskFramework, Task
 from tasks.sqlite import SqliteTaskService
 
@@ -42,8 +47,6 @@ def hello(task: Task, name: str):
 
 framework.main()
 ```
-
-Note that the `Task` interface contains many utilities to report back, including progress tracking, data transfer and logging.
 
 ## Installation
 
