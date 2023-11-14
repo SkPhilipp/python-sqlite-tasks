@@ -102,10 +102,11 @@ class TaskService(ABC):
 
 
 class TaskStatus(Enum):
-    SCHEDULED = 0
-    RUNNING = 1
-    COMPLETED = 2
-    FAILED = 3
+    RUN_SCHEDULED = 0
+    RUN_ACTIVE = 1
+    RUN_FAILED = 2
+    TASK_COMPLETED = 3
+    TASK_FAILED = 4
 
 
 class Task:
@@ -127,23 +128,26 @@ class Task:
     def log_error(self, message: str):
         self._task_service.frame_append(self, TaskFrame(type=TaskFrameType.LOG_ERROR, data=message))
 
-    def schedule(self, delay: timedelta):
+    def run_scheduled(self, delay: timedelta):
         self._task_service.task_schedule(self, delay)
-        self._task_service.frame_append(self, TaskFrame(type=TaskFrameType.STATUS, data=TaskStatus.SCHEDULED))
+        self._task_service.frame_append(self, TaskFrame(type=TaskFrameType.STATUS, data=TaskStatus.RUN_SCHEDULED))
 
     def run(self):
         self._task_service.task_unschedule(self)
-        self._task_service.frame_append(self, TaskFrame(type=TaskFrameType.STATUS, data=TaskStatus.RUNNING))
+        self._task_service.frame_append(self, TaskFrame(type=TaskFrameType.STATUS, data=TaskStatus.RUN_ACTIVE))
 
-    def complete(self):
-        self._task_service.frame_append(self, TaskFrame(type=TaskFrameType.STATUS, data=TaskStatus.COMPLETED))
+    def run_fail(self):
+        self._task_service.frame_append(self, TaskFrame(type=TaskFrameType.STATUS, data=TaskStatus.RUN_FAILED))
 
-    def fail(self):
-        self._task_service.frame_append(self, TaskFrame(type=TaskFrameType.STATUS, data=TaskStatus.FAILED))
+    def task_complete(self):
+        self._task_service.frame_append(self, TaskFrame(type=TaskFrameType.STATUS, data=TaskStatus.TASK_COMPLETED))
+
+    def task_fail(self):
+        self._task_service.frame_append(self, TaskFrame(type=TaskFrameType.STATUS, data=TaskStatus.TASK_FAILED))
 
     def runs(self):
         status_changes = self._task_service.frames(self, TaskFrameType.STATUS)
-        return len([status_change for status_change in status_changes if status_change.data == TaskStatus.RUNNING])
+        return len([status_change for status_change in status_changes if status_change.data == TaskStatus.RUN_ACTIVE])
 
     def __eq__(self, other):
         return self.id == other.id
@@ -192,16 +196,18 @@ class TaskRegistry:
             effective_parameters.update(task.parameters)
             effective_parameters["task"] = task
             handler(**effective_parameters)
-            task.complete()
+            task.task_complete()
         except Exception as e:
             task.log_error(str(e))
             runs = task.runs()
             if runs >= self.run_limit:
                 task.log_error(f"Failed {runs} runs, exceeded run limit of {self.run_limit}")
-                task.fail()
+                task.run_fail()
+                task.task_fail()
             else:
                 task.log_error(f"Failed {runs} runs, rescheduling")
-                task.schedule(timedelta(seconds=self.run_reschedule_delay))
+                task.run_fail()
+                task.run_scheduled(timedelta(seconds=self.run_reschedule_delay))
 
 
 class TaskFramework:
@@ -253,7 +259,7 @@ class TaskFramework:
         :return:
         """
         names = list(self._task_registry.handlers.keys())
-        print(f"Handling tasks: {names}")
+        print(f"Handling task s: {names}")
         while True:
             task = self._task_service.task_next(names)
             if task is not None:

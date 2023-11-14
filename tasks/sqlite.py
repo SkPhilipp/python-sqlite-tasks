@@ -91,7 +91,7 @@ class SqliteTaskService(TaskService):
                     resume_from_frame_id = db_frame.id
                     frame = TaskFrame(db_frame.type, None, db_frame.time)
                     frame.data = db_frame.data_read()
-                    if db_frame.type == TaskFrameType.STATUS and (frame.data == TaskStatus.COMPLETED or frame.data == TaskStatus.FAILED):
+                    if db_frame.type == TaskFrameType.STATUS and (frame.data == TaskStatus.TASK_COMPLETED or frame.data == TaskStatus.RUN_FAILED):
                         finished = True
                     frames.append(frame)
             for frame in frames:

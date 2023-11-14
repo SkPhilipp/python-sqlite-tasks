@@ -24,14 +24,14 @@ def test__service__create_next():
     assert service.task_next(["handler"]) == task
 
 
-def test__service__run_completed():
+def test__service__task_completed():
     service, registry = setup()
     task = service.task_create(name="handler", parameters={"option": "a"})
     registry.run(task)
     assert service.frames(task) == [
-        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUNNING),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_ACTIVE),
         TaskFrame(TaskFrameType.DATA, "option=a"),
-        TaskFrame(TaskFrameType.STATUS, TaskStatus.COMPLETED)
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.TASK_COMPLETED)
     ]
 
 
@@ -40,28 +40,45 @@ def test__service__run_failed():
     task = service.task_create(name="handler_erring", parameters={})
     registry.run(task)
     assert service.frames(task) == [
-        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUNNING),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_ACTIVE),
         TaskFrame(TaskFrameType.DATA, "This is run 1"),
         TaskFrame(TaskFrameType.LOG_ERROR, "Something went wrong"),
         TaskFrame(TaskFrameType.LOG_ERROR, "Failed 1 runs, rescheduling"),
-        TaskFrame(TaskFrameType.STATUS, TaskStatus.SCHEDULED),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_FAILED),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_SCHEDULED),
     ]
 
 
-def test__service__run_rescheduled():
+def test__service__task_failed():
     service, registry = setup()
     task = service.task_create(name="handler_erring", parameters={})
     registry.run(task)
     registry.run(task)
+    registry.run(task)
+    registry.run(task)
     assert service.frames(task) == [
-        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUNNING),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_ACTIVE),
         TaskFrame(TaskFrameType.DATA, "This is run 1"),
         TaskFrame(TaskFrameType.LOG_ERROR, "Something went wrong"),
         TaskFrame(TaskFrameType.LOG_ERROR, "Failed 1 runs, rescheduling"),
-        TaskFrame(TaskFrameType.STATUS, TaskStatus.SCHEDULED),
-        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUNNING),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_FAILED),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_SCHEDULED),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_ACTIVE),
         TaskFrame(TaskFrameType.DATA, "This is run 2"),
         TaskFrame(TaskFrameType.LOG_ERROR, "Something went wrong"),
         TaskFrame(TaskFrameType.LOG_ERROR, "Failed 2 runs, rescheduling"),
-        TaskFrame(TaskFrameType.STATUS, TaskStatus.SCHEDULED),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_FAILED),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_SCHEDULED),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_ACTIVE),
+        TaskFrame(TaskFrameType.DATA, "This is run 3"),
+        TaskFrame(TaskFrameType.LOG_ERROR, "Something went wrong"),
+        TaskFrame(TaskFrameType.LOG_ERROR, "Failed 3 runs, rescheduling"),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_FAILED),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_SCHEDULED),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_ACTIVE),
+        TaskFrame(TaskFrameType.DATA, "This is run 4"),
+        TaskFrame(TaskFrameType.LOG_ERROR, "Something went wrong"),
+        TaskFrame(TaskFrameType.LOG_ERROR, "Failed 4 runs, exceeded run limit of 4"),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_FAILED),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.TASK_FAILED)
     ]

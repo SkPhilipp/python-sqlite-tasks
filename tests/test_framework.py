@@ -19,7 +19,7 @@ class StubTaskService(TaskService):
         return Task(_id=1, name=name, parameters=parameters, task_service=self)
 
 
-def test_run_completed():
+def test__registry__run():
     service = StubTaskService()
     registry = TaskRegistry()
 
@@ -30,13 +30,13 @@ def test_run_completed():
     demo_task = service.task_create(name=long_task.__name__, parameters={"option": "a"})
     registry.run(demo_task)
     assert service._frames == [
-        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUNNING),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_ACTIVE),
         TaskFrame(TaskFrameType.DATA, "option=a"),
-        TaskFrame(TaskFrameType.STATUS, TaskStatus.COMPLETED)
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.TASK_COMPLETED)
     ]
 
 
-def test_run_failed():
+def test__registry__run_failed():
     service = StubTaskService()
     registry = TaskRegistry()
 
@@ -48,9 +48,10 @@ def test_run_failed():
     demo_task = service.task_create(name=long_task.__name__, parameters={"option": "a"})
     registry.run(demo_task)
     assert service._frames == [
-        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUNNING),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_ACTIVE),
         TaskFrame(TaskFrameType.DATA, "option=a"),
         TaskFrame(TaskFrameType.LOG_ERROR, "Something went wrong"),
         TaskFrame(TaskFrameType.LOG_ERROR, "Failed 1 runs, rescheduling"),
-        TaskFrame(TaskFrameType.STATUS, TaskStatus.SCHEDULED),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_FAILED),
+        TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_SCHEDULED),
     ]
