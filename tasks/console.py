@@ -12,9 +12,6 @@ class Line(ABC):
     def draw(self, terminal: Terminal):
         pass
 
-    def draw_limited(self, terminal: Terminal):
-        return self.draw(terminal)[:terminal.width]
-
 
 class TaskLine(Line):
     def __init__(self, time: datetime, task_id: int, task_name: str, time_start: datetime):
@@ -44,9 +41,23 @@ class FrameLine(Line):
         self.frame_type = frame_type
         self.frame_data = frame_data
 
+    def _colorized_type(self, terminal: Terminal):
+        if self.frame_type == TaskFrameType.LOG_ERROR:
+            return terminal.red(self.frame_type.name)
+        if self.frame_type == TaskFrameType.LOG_INFO:
+            return terminal.blue(self.frame_type.name)
+        if self.frame_type == TaskFrameType.PROGRESSION:
+            return terminal.blue(self.frame_type.name)
+        if self.frame_type == TaskFrameType.DATA:
+            return terminal.blue(self.frame_type.name)
+        return self.frame_type.name
+
     def draw(self, terminal: Terminal):
         time_formatted = self.time.strftime("%H:%M:%S:%f")[:-3]
-        return f" => => {time_formatted} {self.frame_type.name} {self.frame_data}"
+        line_prefix = f" => => {time_formatted} [{self.frame_type.name}] "
+        data_allowed_length = terminal.width - len(line_prefix)
+        data_string = str(self.frame_data)[:data_allowed_length]
+        return f" => => {time_formatted} [{self._colorized_type(terminal)}] {data_string}"
 
 
 class Console:
@@ -82,7 +93,7 @@ class Console:
         """
         for i, line in enumerate(self.lines[line_offset:]):
             with self.terminal.location(0, self.terminal.height - len(self.lines) - 1 + i + line_offset):
-                line_text = line.draw_limited(self.terminal)
+                line_text = line.draw(self.terminal)
                 print(line_text + " " * (self.terminal.width - len(line_text)))
 
     def print_line(self, line: Line):
