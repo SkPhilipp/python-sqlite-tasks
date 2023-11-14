@@ -7,7 +7,7 @@ are managed by both producers and consumers through a shared SQL database, which
 
 Notable architectural features:
 
-- Both producers and consumers do not communicate with or amongst each other.
+- Both producers and consumers do not directly communicate with or amongst each other.
 - Both producers and consumers do not need to be running at all times.
 - No central broker or infrastructure other than a SQL database is required.
 
