@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "tasks"
+version = "0.0.0"
+description = ""
+authors = ["Philipp Gayret <philipp@release-engineers.com>"]
+readme = "README.md"
+packages = [{ include = "tasks" }]
+license = "SSPL-1.0"
+classifiers = ["Private :: Do not Upload"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+sqlalchemy = "2.0.23"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.3.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
