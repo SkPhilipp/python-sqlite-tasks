@@ -4,8 +4,7 @@ from datetime import datetime, timedelta
 from typing import Generator
 
 from sqlalchemy import Column, Enum, Integer, String, DateTime, ForeignKey, create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 
 from tasks.framework import Task, TaskFrame, TaskFrameType, TaskStatus, TaskService
 
