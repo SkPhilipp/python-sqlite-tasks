@@ -259,7 +259,7 @@ class TaskFramework:
         :return:
         """
         names = list(self._task_registry.handlers.keys())
-        print(f"Handling task s: {names}")
+        print(f"Handling tasks: {names}")
         while True:
             task = self._task_service.task_next(names)
             if task is not None:
