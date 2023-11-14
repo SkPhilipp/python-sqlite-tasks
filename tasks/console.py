@@ -41,7 +41,7 @@ class RunLine(Line):
         return terminal.green(self.task_status.name)
 
     def draw(self, terminal: Terminal):
-        return f" => [+] run {self.run} -- {self._colorized_status(terminal).lower()}"
+        return f" => [+] run {self.run} {self._colorized_status(terminal).lower()}"
 
 
 class FrameLine(Line):
@@ -66,7 +66,7 @@ class FrameLine(Line):
         line_prefix = f" => => {time_formatted} [{self.frame_type.name}] "
         data_allowed_length = terminal.width - len(line_prefix)
         data_string = str(self.frame_data)[:data_allowed_length]
-        return f" => => {time_formatted} [{self._colorized_type(terminal).lower()}] {data_string}"
+        return f" => => {time_formatted} {self._colorized_type(terminal).lower()} {data_string}"
 
 
 class Console:
