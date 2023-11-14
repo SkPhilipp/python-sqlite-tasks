@@ -17,7 +17,7 @@ The [demo](demo) package includes an executable task producer and consumer combi
 
 Producers configure and emit tasks as well as follow their progression, like so:
 
-```commandline
+```python
 #!/usr/bin/env python3
 from tasks.framework import TaskFramework
 from tasks.sqlite import SqliteTaskService
