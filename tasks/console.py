@@ -31,8 +31,17 @@ class RunLine(Line):
         self.run = run
         self.task_status = task_status
 
+    def _colorized_status(self, terminal: Terminal):
+        if self.task_status == TaskStatus.RUN_SCHEDULED:
+            return terminal.yellow(self.task_status.name)
+        if self.task_status == TaskStatus.RUN_FAILED:
+            return terminal.red(self.task_status.name)
+        if self.task_status == TaskStatus.RUN_FAILED:
+            return terminal.red(self.task_status.name)
+        return terminal.green(self.task_status.name)
+
     def draw(self, terminal: Terminal):
-        return f" => [+] run {self.run} -- {self.task_status.name}"
+        return f" => [+] run {self.run} -- {self._colorized_status(terminal).lower()}"
 
 
 class FrameLine(Line):
@@ -57,7 +66,7 @@ class FrameLine(Line):
         line_prefix = f" => => {time_formatted} [{self.frame_type.name}] "
         data_allowed_length = terminal.width - len(line_prefix)
         data_string = str(self.frame_data)[:data_allowed_length]
-        return f" => => {time_formatted} [{self._colorized_type(terminal)}] {data_string}"
+        return f" => => [{time_formatted}] [{self._colorized_type(terminal).lower()}] {data_string}"
 
 
 class Console:
