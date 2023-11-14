@@ -128,12 +128,12 @@ class Task:
         self._task_service.frame_append(self, TaskFrame(type=TaskFrameType.LOG_ERROR, data=message))
 
     def schedule(self, delay: timedelta):
-        self._task_service.frame_append(self, TaskFrame(type=TaskFrameType.STATUS, data=TaskStatus.SCHEDULED))
         self._task_service.task_schedule(self, delay)
+        self._task_service.frame_append(self, TaskFrame(type=TaskFrameType.STATUS, data=TaskStatus.SCHEDULED))
 
     def run(self):
-        self._task_service.frame_append(self, TaskFrame(type=TaskFrameType.STATUS, data=TaskStatus.RUNNING))
         self._task_service.task_unschedule(self)
+        self._task_service.frame_append(self, TaskFrame(type=TaskFrameType.STATUS, data=TaskStatus.RUNNING))
 
     def complete(self):
         self._task_service.frame_append(self, TaskFrame(type=TaskFrameType.STATUS, data=TaskStatus.COMPLETED))
