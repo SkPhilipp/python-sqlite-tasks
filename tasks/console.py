@@ -3,7 +3,7 @@ from datetime import datetime
 
 from blessings import Terminal
 
-from tasks.framework import TaskFrameType, TaskStatus
+from tasks.framework import TaskFrameType, TaskStatus, Task
 
 
 class Line(ABC):
@@ -112,3 +112,18 @@ class Console:
         else:
             print()
         self._redraw_from(0)
+
+    def follow(self, task: Task):
+        self.print_line(TaskLine(datetime.now(), task.id, task.name, datetime.now()))
+        run = None
+        runs = 0
+        for frame in task.task_service.frames_follow(task):
+            if frame.type == TaskFrameType.STATUS:
+                if run is None or frame.data == TaskStatus.RUN_SCHEDULED:
+                    runs += 1
+                    run = RunLine(frame.time, runs, frame.data)
+                    self.print_line(run)
+                else:
+                    run.task_status = frame.data
+            else:
+                self.print_line(FrameLine(frame.time, frame.type, frame.data))

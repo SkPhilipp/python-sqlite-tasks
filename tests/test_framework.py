@@ -15,7 +15,7 @@ class StubTaskService(TaskService):
     def frames(self, task: Task, frame_type: TaskFrameType = None) -> list[TaskFrame]:
         return [frame for frame in self._frames if frame.type == frame_type]
 
-    def task_create(self, name: str, parameters: dict[str, any]) -> Task:
+    def queue(self, name: str, parameters: dict[str, any]) -> Task:
         return Task(_id=1, name=name, parameters=parameters, task_service=self)
 
 
@@ -27,7 +27,7 @@ def test__registry__run():
     def long_task(option: str, task: Task):
         task.data(f"option={option}")
 
-    demo_task = service.task_create(name=long_task.__name__, parameters={"option": "a"})
+    demo_task = service.queue(name=long_task.__name__, parameters={"option": "a"})
     registry.run(demo_task)
     assert service._frames == [
         TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_ACTIVE),
@@ -45,7 +45,7 @@ def test__registry__run_failed():
         task.data(f"option={option}")
         raise Exception("Something went wrong")
 
-    demo_task = service.task_create(name=long_task.__name__, parameters={"option": "a"})
+    demo_task = service.queue(name=long_task.__name__, parameters={"option": "a"})
     registry.run(demo_task)
     assert service._frames == [
         TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_ACTIVE),

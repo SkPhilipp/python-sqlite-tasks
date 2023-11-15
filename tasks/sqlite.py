@@ -99,7 +99,7 @@ class SqliteTaskService(TaskService):
             if not finished:
                 time.sleep(poll_interval)
 
-    def task_create(self, name: str, parameters: dict[str, any]) -> Task:
+    def queue(self, name: str, parameters: dict[str, any]) -> Task:
         with self.Session() as session:
             scheduled_at = datetime.now()
             db_task = DbTask(name=name, scheduled_at=scheduled_at)

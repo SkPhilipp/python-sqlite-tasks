@@ -20,13 +20,13 @@ def setup() -> (SqliteTaskService, TaskRegistry):
 
 def test__service__create_next():
     service, registry = setup()
-    task = service.task_create(name="handler", parameters={"option": "a"})
+    task = service.queue(name="handler", parameters={"option": "a"})
     assert service.task_next(["handler"]) == task
 
 
 def test__service__task_completed():
     service, registry = setup()
-    task = service.task_create(name="handler", parameters={"option": "a"})
+    task = service.queue(name="handler", parameters={"option": "a"})
     registry.run(task)
     assert service.frames(task) == [
         TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_ACTIVE),
@@ -37,7 +37,7 @@ def test__service__task_completed():
 
 def test__service__run_failed():
     service, registry = setup()
-    task = service.task_create(name="handler_erring", parameters={})
+    task = service.queue(name="handler_erring", parameters={})
     registry.run(task)
     assert service.frames(task) == [
         TaskFrame(TaskFrameType.STATUS, TaskStatus.RUN_ACTIVE),
@@ -51,7 +51,7 @@ def test__service__run_failed():
 
 def test__service__task_failed():
     service, registry = setup()
-    task = service.task_create(name="handler_erring", parameters={})
+    task = service.queue(name="handler_erring", parameters={})
     registry.run(task)
     registry.run(task)
     registry.run(task)

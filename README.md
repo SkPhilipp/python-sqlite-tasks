@@ -19,13 +19,13 @@ Producers configure and emit tasks as well as follow their progression, like so:
 
 ```python
 #!/usr/bin/env python3
-from tasks.framework import TaskFramework
+from tasks.console import Console
 from tasks.sqlite import SqliteTaskService
 
-framework = TaskFramework(SqliteTaskService("sqlite:///tasks.db"))
-task = framework.queue("hello", {"name": "world"})
-for frame in framework.follow(task):
-    print(frame)
+task_service = SqliteTaskService("sqlite:///tasks.db")
+task = task_service.queue("hello", {"name": "world"})
+console = Console()
+console.follow(task)    
 ```
 
 ### Consumers
@@ -33,19 +33,20 @@ for frame in framework.follow(task):
 Consumers can claim tasks and report back data, logs and status updates through a `Task` object:
 
 ```python
-#!/usr/bin/env python3
-from tasks.framework import TaskFramework, Task
+from tasks.framework import Task, TaskRegistry
 from tasks.sqlite import SqliteTaskService
 
-framework = TaskFramework(SqliteTaskService("sqlite:///tasks.db"))
+task_service = SqliteTaskService("sqlite:///tasks.db")
+task_registry = TaskRegistry()
 
 
-@framework.handler()
+@task_registry.task_handler()
 def hello(task: Task, name: str):
     task.log_info(f"Hello, {name}!")
 
 
-framework.main()
+task_registry.listen(task_service)
+
 ```
 
 ## Installation

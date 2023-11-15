@@ -1,12 +1,12 @@
-from tasks.framework import TaskFramework, Task
+from tasks.framework import Task, TaskRegistry
 from tasks.sqlite import SqliteTaskService
 
 if __name__ == "__main__":
     task_service = SqliteTaskService("sqlite:///tasks.db")
-    framework = TaskFramework(task_service)
+    task_registry = TaskRegistry()
 
 
-    @framework.handler()
+    @task_registry.task_handler()
     def hello(task: Task, name: str):
         task.log_info(f"Hello, {name}! I'm going for a nap..")
         task.log_info("I'm back, here's some data:")
@@ -16,4 +16,4 @@ if __name__ == "__main__":
         raise Exception("Oh no! See you next time!")
 
 
-    framework.main()
+    task_registry.listen(task_service)
