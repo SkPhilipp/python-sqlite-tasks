@@ -15,7 +15,7 @@ The [demo](demo) package includes an executable task producer and consumer combi
 
 ### Producers
 
-Producers configure and emit tasks as well as follow their progression, like so:
+Producers queue tasks as can follow their progression, like so:
 
 ```python
 #!/usr/bin/env python3
@@ -30,7 +30,7 @@ console.follow(task)
 
 ### Consumers
 
-Consumers can claim tasks and report back data, logs and status updates through a `Task` object:
+Consumers handle tasks and report back data, logs and status updates through a `Task` object:
 
 ```python
 from tasks.framework import Task, TaskRegistry
