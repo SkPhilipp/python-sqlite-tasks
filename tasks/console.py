@@ -38,6 +38,8 @@ class RunLine(Line):
             return terminal.red(self.task_status.name)
         if self.task_status == TaskStatus.RUN_FAILED:
             return terminal.red(self.task_status.name)
+        if self.task_status == TaskStatus.TASK_FAILED:
+            return terminal.red(self.task_status.name)
         return terminal.green(self.task_status.name)
 
     def draw(self, terminal: Terminal):
@@ -125,5 +127,6 @@ class Console:
                     self.print_line(run)
                 else:
                     run.task_status = frame.data
+                    self._redraw_from(0)
             else:
                 self.print_line(FrameLine(frame.time, frame.type, frame.data))

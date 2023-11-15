@@ -25,7 +25,7 @@ from tasks.sqlite import SqliteTaskService
 task_service = SqliteTaskService("sqlite:///tasks.db")
 task = task_service.queue("hello", {"name": "world"})
 console = Console()
-console.follow(task)    
+console.follow(task)
 ```
 
 ### Consumers
@@ -46,7 +46,6 @@ def hello(task: Task, name: str):
 
 
 task_registry.listen(task_service)
-
 ```
 
 ## Installation
