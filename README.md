@@ -2,8 +2,8 @@
 
 [![Status: Alpha](https://img.shields.io/badge/status-alpha-red)](https://release-engineers.com/open-source-badges/)
 
-For serious task management on a budget. This is a Python library for orchestrating long-lived tasks without requiring any backing infrastructure. Tasks
-are managed by both producers and consumers through a shared SQL database, which can even be a local SQLite file.
+For serious task management on a budget. This is a Python library for orchestrating long-lived asynchronous tasks without requiring backing infrastructure other
+than a database. Tasks are managed by both producers and consumers through a shared SQL database, which can even be a local SQLite file.
 
 Notable architectural features:
 
