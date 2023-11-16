@@ -221,4 +221,4 @@ class TaskRegistry:
             if task is not None:
                 self.run(task)
             else:
-                sleep(0.05)
+                sleep(0.01)

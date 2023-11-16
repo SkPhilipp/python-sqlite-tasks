@@ -3,7 +3,7 @@ import time
 from datetime import datetime, timedelta
 from typing import Generator
 
-from sqlalchemy import Column, Enum, Integer, String, DateTime, ForeignKey, create_engine
+from sqlalchemy import Column, Enum, Integer, String, DateTime, ForeignKey, create_engine, Index
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 
 from tasks.framework import Task, TaskFrame, TaskFrameType, TaskStatus, TaskService
@@ -24,6 +24,9 @@ class DbTask(Base):
 
     def parameters_read(self):
         return json.loads(self.parameters)
+
+
+Index('name_x_scheduled_at', DbTask.name, DbTask.scheduled_at)
 
 
 class DbTaskFrame(Base):
@@ -54,6 +57,9 @@ class DbTaskFrame(Base):
         elif self.type == TaskFrameType.STATUS:
             return TaskStatus[self.data]
         return self.data
+
+
+Index('task_id_x_type_time', DbTaskFrame.task_id, DbTaskFrame.type, DbTaskFrame.time)
 
 
 class SqliteTaskService(TaskService):
