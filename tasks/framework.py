@@ -117,35 +117,88 @@ class Task:
         self.task_service: TaskService = task_service
 
     def data(self, data: any):
+        """
+        Emits a data frame, generally the (partial) result of a task.
+
+        :param data:
+        :return:
+        """
         self.task_service.frame_append(self, TaskFrame(type=TaskFrameType.DATA, data=data))
 
     def progression(self, current: any):
+        """
+        Emits a progression frame, generally used to later resume from a certain point when rescheduling a task.
+        :param current:
+        :return:
+        """
         self.task_service.frame_append(self, TaskFrame(type=TaskFrameType.PROGRESSION, data=current))
 
     def log_info(self, message: str):
+        """
+        Emits an info-level log frame.
+
+        :param message:
+        :return:
+        """
         self.task_service.frame_append(self, TaskFrame(type=TaskFrameType.LOG_INFO, data=message))
 
     def log_error(self, message: str):
+        """
+        Emits an error-level log frame.
+
+        :param message:
+        :return:
+        """
         self.task_service.frame_append(self, TaskFrame(type=TaskFrameType.LOG_ERROR, data=message))
 
     def run_scheduled(self, delay: timedelta):
+        """
+        Reschedule a task to be run after a certain delay.
+
+        :param delay:
+        :return:
+        """
         self.task_service.task_schedule(self, delay)
         self.task_service.frame_append(self, TaskFrame(type=TaskFrameType.STATUS, data=TaskStatus.RUN_SCHEDULED))
 
     def run(self):
+        """
+        Mark a task as currently running.
+
+        :return:
+        """
         self.task_service.task_unschedule(self)
         self.task_service.frame_append(self, TaskFrame(type=TaskFrameType.STATUS, data=TaskStatus.RUN_ACTIVE))
 
     def run_fail(self):
+        """
+        Mark a task run as failed, to be potentially rescheduled by the scheduler.
+
+        :return:
+        """
         self.task_service.frame_append(self, TaskFrame(type=TaskFrameType.STATUS, data=TaskStatus.RUN_FAILED))
 
     def task_complete(self):
+        """
+        Mark a task as completed.
+        :return:
+        """
         self.task_service.frame_append(self, TaskFrame(type=TaskFrameType.STATUS, data=TaskStatus.TASK_COMPLETED))
 
     def task_fail(self):
+        """
+        Mark a task as failed.
+
+        :return:
+        """
         self.task_service.frame_append(self, TaskFrame(type=TaskFrameType.STATUS, data=TaskStatus.TASK_FAILED))
 
     def runs(self):
+        """
+        Retrieve the number of times a `run` has been invoked on this task.
+
+        :return:
+        """
         status_changes = self.task_service.frames(self, TaskFrameType.STATUS)
         return len([status_change for status_change in status_changes if status_change.data == TaskStatus.RUN_ACTIVE])
 
