@@ -9,6 +9,7 @@ Notable architectural features:
 
 - Both producers and consumers do not directly communicate with or amongst each other.
 - Both producers and consumers do not need to be running at all times.
+- Producers and consumers can be deployed independently, or as a single application.
 - No central broker or infrastructure other than a SQL database is required.
 
 The [demo](demo) package includes an executable task producer and consumer combination sharing a local SQLite database.
