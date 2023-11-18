@@ -202,6 +202,18 @@ class Task:
         status_changes = self.task_service.frames(self, TaskFrameType.STATUS)
         return len([status_change for status_change in status_changes if status_change.data == TaskStatus.RUN_ACTIVE])
 
+    def queue(self, name: str, parameters: dict[str, any]) -> 'Task':
+        """
+        Queue up a new task for retrieval by the scheduler, and emits a log frame indicating it has been queued.
+
+        :param name:
+        :param parameters:
+        :return:
+        """
+        task = self.task_service.queue(name, parameters)
+        self.task_service.frame_append(self, TaskFrame(type=TaskFrameType.LOG_INFO, data=f"queued task {task.id} of type {name}"))
+        return task
+
     def __eq__(self, other):
         return self.id == other.id
 
