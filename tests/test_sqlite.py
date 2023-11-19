@@ -6,11 +6,11 @@ def setup() -> (SqliteTaskService, TaskRegistry):
     service = SqliteTaskService("sqlite+pysqlite:///:memory:")
     registry = TaskRegistry()
 
-    @registry.task_handler()
+    @registry.handler()
     def handler(option: str, task: Task):
         task.data(f"option={option}")
 
-    @registry.task_handler()
+    @registry.handler()
     def handler_erring(task: Task):
         task.data(f"This is run {task.runs()}")
         raise Exception("Something went wrong")

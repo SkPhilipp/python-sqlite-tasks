@@ -41,7 +41,7 @@ task_service = SqliteTaskService("sqlite:///tasks.db")
 task_registry = TaskRegistry()
 
 
-@task_registry.task_handler()
+@task_registry.handler()
 def hello(task: Task, name: str):
     task.log_info(f"Hello, {name}!")
 

@@ -233,7 +233,7 @@ class TaskRegistry:
         self.run_limit = 4
         self.run_reschedule_delay = 0
 
-    def task_handler(self, name: str = None):
+    def handler(self, name: str = None):
         """
         Decorator which registers a task by name.
         :param name: Name of the task, defaults to the name of the function
