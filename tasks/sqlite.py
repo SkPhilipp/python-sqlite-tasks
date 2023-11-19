@@ -1,7 +1,7 @@
 import json
 import time
 from datetime import datetime, timedelta
-from typing import Generator
+from typing import Generator, Callable
 
 from sqlalchemy import Column, Enum, Integer, String, DateTime, ForeignKey, create_engine, Index
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
@@ -105,14 +105,15 @@ class SqliteTaskService(TaskService):
             if not finished:
                 time.sleep(poll_interval)
 
-    def queue(self, name: str, parameters: dict[str, any]) -> Task:
+    def queue(self, name: str | Callable, parameters: dict[str, any], scheduled_at: datetime = None) -> Task:
         with self.Session() as session:
-            scheduled_at = datetime.now()
-            db_task = DbTask(name=name, scheduled_at=scheduled_at)
+            effective_scheduled_at = scheduled_at if scheduled_at is not None else datetime.now()
+            effective_name = name if isinstance(name, str) else name.__name__
+            db_task = DbTask(name=effective_name, scheduled_at=effective_scheduled_at)
             db_task.parameters_write(parameters)
             session.add(db_task)
             session.commit()
-            return Task(db_task.id, name, parameters, self)
+            return Task(db_task.id, effective_name, parameters, self)
 
     def task_schedule(self, task: Task, delay: timedelta):
         with self.Session() as session:
